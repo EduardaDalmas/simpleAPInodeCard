@@ -71,9 +71,10 @@ server.put("/cards/:id", checkCard, (req, res) => {
 
 server.delete("/cards/:id", checkCard, (req, res) => {
     const {id} = req.body;
-    const card = cards.find(card => card.id = id);
+    const cardIndex = cards.findIndex(card => card.id = id);
 
-    cards.splice(card, id);
+    console.log(cardIndex);
+    //cards.splice(card, id);
 
     res.json(cards);
 });
