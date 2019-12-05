@@ -9,6 +9,17 @@ server.use((req, res, next) => {
     next();
 });
 
+function checkCard(req, res, next) {
+    const {id} = req.params;
+    const card = cards.find(card => card.id = id);
+
+    if(!card) {
+        return res.json({error: "card not found."});
+    }
+
+    next();
+};
+
 let nextId = 1;
 const cards =[];
 
@@ -36,7 +47,7 @@ server.post ("/cards", (req, res) => {
     return res.json(card);
 });
 
-server.put("/cards/:id", (req, res) => {
+server.put("/cards/:id", checkCard, (req, res) => {
     const {id} = req.params;
     const {title, content} = req.body; 
 
@@ -46,18 +57,25 @@ server.put("/cards/:id", (req, res) => {
         return res.json({error: "card not found."});
     }
 
-    console.log(title);
     if(title) {
         card.title = title;
     }
 
-    console.log(content);
     if (content) {
         card.content = content;
     }
 
 
     return res.json(card);
+});
+
+server.delete("/cards/:id", checkCard, (req, res) => {
+    const {id} = req.body;
+    const card = cards.find(card => card.id = id);
+
+    cards.splice(card, id);
+
+    res.json(cards);
 });
 
 server.listen(3333);
