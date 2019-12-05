@@ -70,13 +70,17 @@ server.put("/cards/:id", checkCard, (req, res) => {
 });
 
 server.delete("/cards/:id", checkCard, (req, res) => {
-    const {id} = req.body;
-    const cardIndex = cards.findIndex(card => card.id = id);
+    const {id} = req.params;
 
-    console.log(cardIndex);
-    //cards.splice(card, id);
+     function teste(item){
+         console.log(item.id);
+         console.log(id);
+     }
+     const scrapIndex = scraps.findIndex(scrap => scrap.id = id);;
 
-    res.json(cards);
+     scraps.splice(scrapIndex, 1);
+
+    res.json(scraps);
 });
 
 server.listen(3333);
