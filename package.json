@@ -1,0 +1,17 @@
+{
+  "name": "NodeAPI",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/EduardaDalmas/simpleAPInodeCard.git",
+  "author": "Eduarda Brisch Dalmas <eduardadalmas@ienh.com.br>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.1"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
