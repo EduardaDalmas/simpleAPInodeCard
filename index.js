@@ -72,15 +72,11 @@ server.put("/cards/:id", checkCard, (req, res) => {
 server.delete("/cards/:id", checkCard, (req, res) => {
     const {id} = req.params;
 
-     function teste(item){
-         console.log(item.id);
-         console.log(id);
-     }
-     const scrapIndex = scraps.findIndex(scrap => scrap.id = id);;
+    const cardIndex = cards.findIndex(card => card.id == id);
 
-     scraps.splice(scrapIndex, 1);
+    cards.splice(cardIndex, 1);
 
-    res.json(scraps);
+    res.json(cards);
 });
 
 server.listen(3333);
