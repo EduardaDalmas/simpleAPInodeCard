@@ -1,17 +1,22 @@
 const express = require('express');
+const cors = require('cors');
 
 const server = express();
 
 server.use(express.json());
 
+server.use(cors());
+
 server.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+   res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
 });
 
 function checkCard(req, res, next) {
     const {id} = req.params;
-    const card = cards.find(card => card.id = id);
+    const card = cards.find(card => card.id == id);
 
     if(!card) {
         return res.json({error: "card not found."});
