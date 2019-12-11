@@ -1,4 +1,5 @@
 const express = require('express');
+const database = require('./database');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -12,9 +13,19 @@ server.use((req, res, next) => {
    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    console.log(process.env.TESTE);
+
     next();
 });
+
+//midle
+async function lastId(req, res, next) {
+    await database.query(`SELECT MAX(id) AS id FROM cards` , { type: database.QueryTypes.SELECT } )
+    .then(results => {
+        nextId = results[0].id;
+    });
+
+    next();
+}
 
 function checkCard(req, res, next) {
     const {id} = req.params;
@@ -27,25 +38,37 @@ function checkCard(req, res, next) {
     next();
 };
 
-let nextId = 1;
-const cards =[];
+let nextId = 0;
+let cards =[];
 
 //routes
 server.get("/", (req, res) => {
     return res.json({result: "NodeAPI" });
 });
 
-server.get("/cards", (req, res) => {
+server.get("/cards", lastId, async (req, res) => {
+    await database.query(`SELECT * FROM cards` , { type: database.QueryTypes.SELECT } )
+    .then(results => {
+        cards = results;
+    });
     return res.json(cards);
 });
 
-server.post ("/cards", (req, res) => {
+server.post ("/cards", lastId, (req, res) => {
+    nextId++;
     const {title, content} = req.body;
-    const card = {
+    let card = {
         id: nextId,
         title,
         content
     };
+
+    database.query(`INSERT INTO cards VALUES ( ${nextId}, '${title}' , '${content}');`,
+        { type: database.QueryTypes.INSERT } 
+    )
+    .then(results => {
+        nextId = results[0].id;
+    });
 
     cards.push(card);
 
@@ -54,7 +77,8 @@ server.post ("/cards", (req, res) => {
     return res.json(card);
 });
 
-server.put("/cards/:id", checkCard, (req, res) => {
+server.put("/cards/:id", checkCard, async (req, res) => {
+    console.log("teste chegou");
     const {id} = req.params;
     const {title, content} = req.body; 
 
@@ -72,11 +96,16 @@ server.put("/cards/:id", checkCard, (req, res) => {
         card.content = content;
     }
 
+    await database.query(`UPDATE cards SET  title = '${card.title}', content = '${card.content}' WHERE id = ${id};`,
+        { type: database.QueryTypes.UPDATE } 
+    );
+     
 
     return res.json(card);
 });
 
-server.delete("/cards/:id", checkCard, (req, res) => {
+server.delete("/cards/:id", async (req, res) => {
+
     const {id} = req.params;
 
     const cardIndex = cards.findIndex(card => card.id == id);
@@ -84,6 +113,12 @@ server.delete("/cards/:id", checkCard, (req, res) => {
     cards.splice(cardIndex, 1);
 
     res.json(cards);
+
+    await database.query(`DELETE FROM cards WHERE id = ${id};`,
+        { type: database.QueryTypes.DELETE } 
+    );
+
+    
 });
 
 server.listen(process.env.PORT);
