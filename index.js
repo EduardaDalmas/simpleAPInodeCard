@@ -77,34 +77,36 @@ server.post ("/cards", lastId, (req, res) => {
     return res.json(card);
 });
 
-server.put("/cards/:id", checkCard, async (req, res) => {
-    console.log("teste chegou");
+server.put("/cards/:id", checkCard, (req, res) => {
     const {id} = req.params;
-    const {title, content} = req.body; 
+    const {title, content} = req.body;
+    let updated = false;
 
-    const card = cards.find(card => card.id = id);
-
-    if(!card) {
-        return res.json({error: "card not found."});
-    }
+    const card = cards.find(card => card.id == id);
 
     if(title) {
         card.title = title;
+        updated = true;
     }
 
-    if (content) {
+    if(content) {
         card.content = content;
+        updated = true;
     }
 
-    await database.query(`UPDATE cards SET  title = '${card.title}', content = '${card.content}' WHERE id = ${id};`,
-        { type: database.QueryTypes.UPDATE } 
-    );
-     
+    if(updated) {
+        database.query(`UPDATE cards SET title = '${card.title}', content = '${card.content}' WHERE  id = ${id}`,
+            { type: database.QueryTypes.UPDATE}
+        )
+        .then(update => {
+            console.log(update);
+        });
+    };
 
-    return res.json(card);
+    return res.json(cards);
 });
 
-server.delete("/cards/:id", async (req, res) => {
+server.delete("/cards/:id", checkCard, async (req, res) => {
 
     const {id} = req.params;
 
